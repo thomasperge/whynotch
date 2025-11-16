@@ -3,7 +3,6 @@
 //  whynotch
 //
 //  Source under MPL 2.0 from https://github.com/avaidyam/Parrot/
-//  (mirrors boringNotch’s implementation)
 //
 
 import AppKit

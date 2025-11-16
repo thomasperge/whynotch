@@ -2,7 +2,6 @@
 //  NotchShape.swift
 //  whynotch
 //
-//  Ported from boringNotch (originally by Kai Azim, DynamicNotchKit)
 //
 
 import SwiftUI

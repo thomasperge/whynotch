@@ -2,7 +2,6 @@
 //  NotchWindowController.swift
 //  whynotch
 //
-//  Created by ChatGPT on 14/11/2025.
 //
 
 import AppKit
@@ -10,7 +9,8 @@ import SwiftUI
 
 final class NotchWindowController: NSObject {
     private enum Constants {
-        static let notchSize = CGSize(width: 255, height: 33)
+        static let notchWidth: CGFloat = 255
+        static let notchMaxHeight: CGFloat = 53 // Compact (33) + Expanded (20)
         static let topInset: CGFloat = 0
     }
 
@@ -90,13 +90,16 @@ final class NotchWindowController: NSObject {
 
     private func computeNotchFrame(for screen: NSScreen?) -> NSRect {
         guard let screen else {
-            return NSRect(origin: .zero, size: Constants.notchSize)
+            return NSRect(origin: .zero, size: CGSize(width: Constants.notchWidth, height: Constants.notchMaxHeight))
         }
 
-        let originX = screen.frame.midX - (Constants.notchSize.width / 2)
-        let originY = screen.frame.maxY - Constants.notchSize.height - Constants.topInset
+        // Always position from the top of the screen
+        // originY is the bottom-left corner in Cocoa coordinates
+        // So we need: screen.maxY - windowHeight to get the top aligned
+        let originX = screen.frame.midX - (Constants.notchWidth / 2)
+        let originY = screen.frame.maxY - Constants.notchMaxHeight - Constants.topInset
 
-        return NSRect(x: originX, y: originY, width: Constants.notchSize.width, height: Constants.notchSize.height)
+        return NSRect(x: originX, y: originY, width: Constants.notchWidth, height: Constants.notchMaxHeight)
     }
 }
 

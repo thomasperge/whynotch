@@ -2,7 +2,6 @@
 //  NotchPanel.swift
 //  whynotch
 //
-//  Inspired by boringNotch’s custom NSPanel configuration.
 //
 
 import AppKit

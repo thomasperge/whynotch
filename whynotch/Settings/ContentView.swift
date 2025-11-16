@@ -2,7 +2,6 @@
 //  ContentView.swift
 //  whynotch
 //
-//  Created by Thomas Kauffmant on 14/11/2025.
 //
 
 import SwiftUI
@@ -22,3 +21,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+
