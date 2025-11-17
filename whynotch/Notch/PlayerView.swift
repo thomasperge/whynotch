@@ -41,7 +41,7 @@ struct PlayerView: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .padding(.horizontal, 24.5)
-                    .padding(.top, 6)
+                    .padding(.top, 10)
             } else if let title = title {
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
@@ -49,7 +49,7 @@ struct PlayerView: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .padding(.horizontal, 24.5)
-                    .padding(.top, 6)
+                    .padding(.top, 10)
             }
             
             // Progress bar with timer
@@ -97,7 +97,9 @@ struct PlayerView: View {
             }
             .padding(.horizontal, 25)
             .padding(.top, 10)
-            .padding(.bottom, 10)
+            .padding(.bottom, 0) // No bottom padding to ensure border visibility
+            
+            Spacer(minLength: 0) // Push content up to ensure border visibility
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
