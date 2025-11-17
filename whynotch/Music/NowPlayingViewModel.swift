@@ -17,12 +17,17 @@ final class NowPlayingViewModel: ObservableObject {
     @Published var title: String?
     @Published var artist: String?
     @Published var shouldShowExpanded: Bool = false
+    @Published var shouldShowPlayer: Bool = false
     @Published var dominantColor: NSColor?
+    @Published var isPlaying: Bool = false
+    @Published var currentTime: TimeInterval = 0
+    @Published var duration: TimeInterval = 0
     
     private var cancellables = Set<AnyCancellable>()
     private var pollingTask: Task<Void, Never>?
     private var spotifyNotificationTask: Task<Void, Never>?
     private var expansionTask: Task<Void, Never>?
+    private var timeUpdateTask: Task<Void, Never>?
     
     init() {
         setupObservers()
@@ -34,6 +39,7 @@ final class NowPlayingViewModel: ObservableObject {
         pollingTask?.cancel()
         spotifyNotificationTask?.cancel()
         expansionTask?.cancel()
+        timeUpdateTask?.cancel()
     }
     
     private func triggerExpansion() {
@@ -49,8 +55,108 @@ final class NowPlayingViewModel: ObservableObject {
     }
     
     func setHoverExpansion(_ isHovering: Bool) {
+        // Avoid state changes if already in the correct state
+        if isHovering && shouldShowPlayer {
+            return
+        }
+        if !isHovering && !shouldShowPlayer {
+            return
+        }
+        
         expansionTask?.cancel()
-        shouldShowExpanded = isHovering
+        
+        // Only show player if there's music playing
+        if isHovering && (artwork != nil || title != nil || artist != nil) {
+            shouldShowPlayer = true
+            shouldShowExpanded = false // Hide Info when showing Player
+            startTimeUpdates()
+        } else if !isHovering {
+            shouldShowPlayer = false
+            shouldShowExpanded = false // Return to Compact when hover ends
+            timeUpdateTask?.cancel()
+            timeUpdateTask = nil
+        }
+    }
+    
+    private func startTimeUpdates() {
+        timeUpdateTask?.cancel()
+        timeUpdateTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                await self?.updatePlaybackTime()
+                try? await Task.sleep(nanoseconds: 200_000_000) // Update every 0.2 seconds
+            }
+        }
+    }
+    
+    private func updatePlaybackTime() async {
+        guard isSpotifyActive() else { return }
+        
+        let script = """
+        tell application "Spotify"
+            try
+                set playerPosition to player position
+                set durationSeconds to duration of current track
+                return {playerPosition, durationSeconds}
+            on error
+                return {0, 0}
+            end try
+        end tell
+        """
+        
+        do {
+            guard let descriptor = try await AppleScriptHelper.execute(script) else { return }
+            guard descriptor.numberOfItems >= 2 else { return }
+            
+            if let position = descriptor.atIndex(1)?.doubleValue {
+                currentTime = position
+            }
+            if let dur = descriptor.atIndex(2)?.doubleValue {
+                // Spotify returns duration in milliseconds
+                duration = dur / 1000.0
+            }
+        } catch {
+            // Silently handle errors
+        }
+    }
+    
+    func togglePlayPause() {
+        Task {
+            let script = """
+            tell application "Spotify"
+                if player state is playing then
+                    pause
+                else
+                    play
+                end if
+            end tell
+            """
+            try? await AppleScriptHelper.executeVoid(script)
+            await fetchFromSpotify()
+        }
+    }
+    
+    func nextTrack() {
+        Task {
+            let script = """
+            tell application "Spotify"
+                next track
+            end tell
+            """
+            try? await AppleScriptHelper.executeVoid(script)
+            await fetchFromSpotify()
+        }
+    }
+    
+    func previousTrack() {
+        Task {
+            let script = """
+            tell application "Spotify"
+                previous track
+            end tell
+            """
+            try? await AppleScriptHelper.executeVoid(script)
+            await fetchFromSpotify()
+        }
     }
     
     private func setupObservers() {
@@ -170,10 +276,6 @@ final class NowPlayingViewModel: ObservableObject {
                 set playerStateStr to player state as string
                 set isPlaying to playerStateStr is "playing"
                 
-                if not isPlaying then
-                    return {false, "", "", ""}
-                end if
-                
                 set currentTrackName to name of current track
                 set currentTrackArtist to artist of current track
                 set artworkURL to artwork url of current track
@@ -206,21 +308,15 @@ final class NowPlayingViewModel: ObservableObject {
                 return
             }
             
-            let isPlaying = firstItem?.booleanValue ?? false
+            let isPlayingValue = firstItem?.booleanValue ?? false
             let trackName = descriptor.atIndex(2)?.stringValue ?? ""
             let trackArtist = descriptor.atIndex(3)?.stringValue ?? ""
             let artworkURL = descriptor.atIndex(4)?.stringValue ?? ""
             
-            if !isPlaying {
-                if artwork != nil || title != nil || artist != nil {
-                    artwork = nil
-                    title = nil
-                    artist = nil
-                    dominantColor = nil
-                }
-                return
-            }
+            // Update playing state (but don't clear data when paused)
+            isPlaying = isPlayingValue
             
+            // Only return early if we have no track info at all
             if trackName.isEmpty && trackArtist.isEmpty {
                 return
             }

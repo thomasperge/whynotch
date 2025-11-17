@@ -10,7 +10,8 @@ import SwiftUI
 final class NotchWindowController: NSObject {
     private enum Constants {
         static let notchWidth: CGFloat = 255
-        static let notchMaxHeight: CGFloat = 53 // Compact (33) + Expanded (20)
+        static let playerWidth: CGFloat = 345
+        static let notchMaxHeight: CGFloat = 130 // Player height (max)
         static let topInset: CGFloat = 0
     }
 
@@ -90,16 +91,17 @@ final class NotchWindowController: NSObject {
 
     private func computeNotchFrame(for screen: NSScreen?) -> NSRect {
         guard let screen else {
-            return NSRect(origin: .zero, size: CGSize(width: Constants.notchWidth, height: Constants.notchMaxHeight))
+            return NSRect(origin: .zero, size: CGSize(width: Constants.playerWidth, height: Constants.notchMaxHeight))
         }
 
         // Always position from the top of the screen
         // originY is the bottom-left corner in Cocoa coordinates
         // So we need: screen.maxY - windowHeight to get the top aligned
-        let originX = screen.frame.midX - (Constants.notchWidth / 2)
+        // Use playerWidth as max width to accommodate all states
+        let originX = screen.frame.midX - (Constants.playerWidth / 2)
         let originY = screen.frame.maxY - Constants.notchMaxHeight - Constants.topInset
 
-        return NSRect(x: originX, y: originY, width: Constants.notchWidth, height: Constants.notchMaxHeight)
+        return NSRect(x: originX, y: originY, width: Constants.playerWidth, height: Constants.notchMaxHeight)
     }
 }
 
