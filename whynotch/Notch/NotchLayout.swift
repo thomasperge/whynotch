@@ -12,8 +12,7 @@ enum NotchLayout {
     static let playerWidth: CGFloat = 345
     static let compactHeight: CGFloat = 33
     static let expandedHeight: CGFloat = 53 // 33 + 20
-    static let playerHeight: CGFloat = 135
+    static let playerHeight: CGFloat = 145
     static let topCornerRadius: CGFloat = 6
     static let bottomCornerRadius: CGFloat = 13
 }
-

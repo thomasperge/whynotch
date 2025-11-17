@@ -26,7 +26,7 @@ struct ProgressBarView: View {
                     
                     // Progress - use dominant color if available
                     Capsule()
-                        .fill(color != nil ? Color(nsColor: color!).opacity(0.7) : .white.opacity(0.7))
+                        .fill(color != nil ? Color(nsColor: color!).opacity(0.85) : .white.opacity(0.7))
                         .frame(width: geometry.size.width * CGFloat(progress), height: 3)
                 }
             }

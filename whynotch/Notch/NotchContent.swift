@@ -38,13 +38,13 @@ struct NotchContent: View {
                     if let artist = artist, let title = title {
                         Text("\(artist) - \(title)")
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.7) : .white.opacity(0.4))
+                            .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.85) : .white.opacity(0.4))
                             .lineLimit(1)
                             .truncationMode(.tail)
                     } else if let title = title {
                         Text(title)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.7) : .white.opacity(0.4))
+                            .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.85) : .white.opacity(0.4))
                             .lineLimit(1)
                             .truncationMode(.tail)
                     }

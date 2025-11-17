@@ -95,9 +95,9 @@ enum ImageColorExtractor {
         // Calculate current brightness
         let currentBrightness = 0.299 * r + 0.587 * g + 0.114 * b
         
-        // If the color is too dark, brighten it to at least 0.6 brightness
-        if currentBrightness < 0.6 {
-            let targetBrightness: CGFloat = 0.65
+        // If the color is too dark, brighten it to at least 0.75 brightness (more vivid)
+        if currentBrightness < 0.75 {
+            let targetBrightness: CGFloat = 0.8 // Increased from 0.65 to 0.8 for more vivid colors
             let scale = targetBrightness / max(currentBrightness, 0.01)
             
             r = min(1.0, r * scale)

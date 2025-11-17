@@ -22,7 +22,7 @@ struct PlayerIndicator: View {
     var body: some View {
         TimelineView(.animation) { context in
             let time = context.date.timeIntervalSinceReferenceDate
-            let indicatorColor = color != nil ? Color(nsColor: color!).opacity(0.7) : Color.gray.opacity(0.75)
+            let indicatorColor = color != nil ? Color(nsColor: color!).opacity(0.85) : Color.gray.opacity(0.75)
             
             HStack(spacing: 2) {
                 ForEach(0..<3, id: \.self) { index in

@@ -20,6 +20,10 @@ struct PlayerView: View {
     let onNext: () -> Void
     let onPrevious: () -> Void
     
+    @State private var isHoveringPrevious = false
+    @State private var isHoveringPlayPause = false
+    @State private var isHoveringNext = false
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Top section - Artwork and animation (same position as Compact/Info)
@@ -36,16 +40,16 @@ struct PlayerView: View {
             // Title/artist below artwork
             if let artist = artist, let title = title {
                 Text("\(artist) - \(title)")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.7) : .white.opacity(0.4))
+                    .font(.system(size: 12.5, weight: .medium))
+                    .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.85) : .white.opacity(0.4))
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .padding(.horizontal, 24.5)
                     .padding(.top, 10)
             } else if let title = title {
                 Text(title)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.7) : .white.opacity(0.4))
+                    .font(.system(size: 12.5, weight: .medium))
+                    .foregroundColor(textColor != nil ? Color(nsColor: textColor!).opacity(0.85) : .white.opacity(0.4))
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .padding(.horizontal, 24.5)
@@ -73,25 +77,36 @@ struct PlayerView: View {
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
                         .frame(width: 24, height: 24)
+                        .background(Circle().fill(isHoveringPrevious ? .white.opacity(0.2) : .clear))
                 }
                 .buttonStyle(PlainButtonStyle())
+                .onHover { hovering in
+                    isHoveringPrevious = hovering
+                }
                 
                 Button(action: onPlayPause) {
                     Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white.opacity(0.9))
                         .frame(width: 32, height: 32)
-                        .background(Circle().fill(.white.opacity(0.15)))
+                        .background(Circle().fill(isHoveringPlayPause ? .white.opacity(0.25) : .white.opacity(0.15)))
                 }
                 .buttonStyle(PlainButtonStyle())
+                .onHover { hovering in
+                    isHoveringPlayPause = hovering
+                }
                 
                 Button(action: onNext) {
                     Image(systemName: "forward.fill")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.white.opacity(0.7))
                         .frame(width: 24, height: 24)
+                        .background(Circle().fill(isHoveringNext ? .white.opacity(0.2) : .clear))
                 }
                 .buttonStyle(PlainButtonStyle())
+                .onHover { hovering in
+                    isHoveringNext = hovering
+                }
                 
                 Spacer()
             }
